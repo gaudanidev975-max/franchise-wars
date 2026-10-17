@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Franchise Wars | Crowdsourced Pop-Culture War</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8 selection:bg-amber-500 selection:text-slate-900">
+
+  <!-- TOP BAR: Bidding Ticker & Secret Admin Access -->
+  <header class="w-full max-w-5xl bg-slate-800/90 border border-slate-700/80 backdrop-blur-md rounded-2xl p-4 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl sticky top-4 z-30">
+    <div class="flex items-center gap-3">
+      <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-xl text-amber-400 font-black text-xl">🏆</div>
+      <div>
+        <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold block">Next Month's Top Bid</span>
+        <div class="text-sm sm:text-base font-extrabold text-amber-400" id="top-bidder-display">
+          $120 by @TrollMaster → <span class="text-white font-semibold">"Star Wars: The Last Jedi"</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openModal('bid')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs sm:text-sm transition-all transform active:scale-95 shadow-lg shadow-amber-500/20">
+        Outbid & Pick Show
+      </button>
+      <button onclick="openAdmin()" class="bg-slate-700/50 hover:bg-slate-700 text-slate-400 hover:text-white p-2.5 rounded-xl text-xs transition-all border border-slate-600/50" title="Admin Panel">
+        🛡️
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="w-full max-w-5xl flex flex-col items-center">
+    
+    <!-- CURRENT TARGET BANNER -->
+    <div class="text-center mb-8 w-full">
+      <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] px-3 py-1 rounded-full uppercase tracking-widest font-bold inline-block mb-3">
+        Current Target (Month 1)
+      </span>
+      <h1 class="text-3xl sm:text-6xl font-black tracking-tight text-white uppercase drop-shadow-md" id="current-show-title">
+        Game of Thrones (Season 8)
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm mt-2">
+        Targeted by: <span class="text-slate-200 font-bold">User_99 ($50 Seed)</span> • Closes in <span class="text-amber-400 font-mono font-bold">14d 06h 12m</span>
+      </p>
+    </div>
+
+    <!-- TUG OF WAR BAR -->
+    <div class="w-full bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 sm:p-7 mb-10 shadow-2xl backdrop-blur-sm">
+      <div class="flex justify-between font-black text-xs sm:text-sm mb-3">
+        <span class="text-emerald-400 flex items-center gap-1.5" id="love-label">
+          <span>💚 LOVE (35%)</span> — <span id="love-amount">$140</span>
+        </span>
+        <span class="text-rose-400 flex items-center gap-1.5" id="hate-label">
+          <span id="hate-amount">$260</span> — <span>HATE (65%) 🔥</span>
+        </span>
+      </div>
+      
+      <!-- Progress Bar Track -->
+      <div class="w-full bg-slate-900 h-7 rounded-xl overflow-hidden flex border border-slate-700/80 p-1 shadow-inner">
+        <div id="love-bar" class="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-l-lg transition-all duration-500" style="width: 35%"></div>
+        <div id="hate-bar" class="bg-gradient-to-r from-rose-500 to-rose-700 h-full rounded-r-lg transition-all duration-500" style="width: 65%"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-5">
+        <button onclick="openModal('love')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 px-4 rounded-xl text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
+          + Defense ($2+)
+        </button>
+        <button onclick="openModal('hate')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-black py-3 px-4 rounded-xl text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg shadow-rose-600/20 active:scale-95">
+          + Slander ($2+)
+        </button>
+      </div>
+    </div>
+
+    <!-- TWO-COLUMN CONTENT FEED -->
+    <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- LOVE COLUMN -->
+      <div class="bg-slate-800/40 border border-emerald-500/20 rounded-2xl p-5 backdrop-blur-sm flex flex-col h-[480px]">
+        <h2 class="text-lg font-bold text-emerald-400 mb-4 flex items-center justify-between border-b border-emerald-500/20 pb-3">
+          <span class="flex items-center gap-2">🛡️ The Defense (Love)</span>
+          <span class="text-xs font-normal text-slate-400" id="love-count">1 entry</span>
+        </h2>
+        <div id="love-list" class="space-y-3 overflow-y-auto custom-scrollbar pr-1 flex-1">
+          <!-- Dynamic Content Inserted Here -->
+        </div>
+      </div>
+
+      <!-- HATE COLUMN -->
+      <div class="bg-slate-800/40 border border-rose-500/20 rounded-2xl p-5 backdrop-blur-sm flex flex-col h-[480px]">
+        <h2 class="text-lg font-bold text-rose-400 mb-4 flex items-center justify-between border-b border-rose-500/20 pb-3">
+          <span class="flex items-center gap-2">🔥 The Slander (Hate)</span>
+          <span class="text-xs font-normal text-slate-400" id="hate-count">2 entries</span>
+        </h2>
+        <div id="hate-list" class="space-y-3 overflow-y-auto custom-scrollbar pr-1 flex-1">
+          <!-- Dynamic Content Inserted Here -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- SUBMISSION / BID MODAL -->
+  <div id="modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      <h3 id="modal-title" class="text-xl font-extrabold mb-1 text-white">Action Title</h3>
+      <p id="modal-subtitle" class="text-xs text-slate-400 mb-5">Select amount and customize your submission.</p>
+      
+      <div class="space-y-4">
+        <!-- Handle Input -->
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Your Handle / Name</label>
+          <input type="text" id="user-handle" placeholder="@twitter_handle or Anon" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" />
+        </div>
+
+        <!-- Amount Selection & Tier Logic -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Contribution Amount ($)</label>
+            <span id="tier-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300">Preset Only (<$5)</span>
+          </div>
+          <input type="number" id="bid-amount" min="2" value="2" oninput="handleAmountChange(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white font-mono focus:outline-none focus:border-amber-500 transition-colors" />
+          <p class="text-[11px] text-amber-400/80 mt-1">💡 Pay $5 or more to write your own custom submission!</p>
+        </div>
+
+        <!-- Text Input (Dynamic based on Tier) -->
+        <div id="text-input-container">
+          <label id="text-input-label" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Select Preset Take</label>
+          
+          <!-- Preset Dropdown (Under $5) -->
+          <select id="preset-dropdown" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors">
+            <!-- Populated via JS -->
+          </select>
+
+          <!-- Custom Textarea ($5+) -->
+          <textarea id="custom-textarea" rows="3" class="hidden w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Type your custom take... Swearing allowed, no slurs/NSFW."></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button onclick="processSubmission()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 active:scale-95 mt-2">
+          Proceed to Payment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN CONTROL MODAL -->
+  <div id="admin-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 border border-rose-500/30 w-full max-w-lg rounded-2xl p-6 relative shadow-2xl">
+      <button onclick="closeAdmin()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold p-1 text-lg">✕</button>
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xl">🛡️</span>
+        <h3 class="text-xl font-extrabold text-white">Admin Moderation Panel</h3>
+      </div>
+
+      <div class="space-y-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-4">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Live Entries Moderation</h4>
+          <div id="admin-entries-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+            <!-- Populated dynamically with delete buttons -->
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-4">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Manual Financial Reset</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="adjustBalance('love', 50)" class="bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-300 border border-emerald-500/30 font-bold p-2 rounded-lg text-xs">+ $50 Love</button>
+            <button onclick="adjustBalance('hate', 50)" class="bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-500/30 font-bold p-2 rounded-lg text-xs">+ $50 Hate</button>
+          </div>
+        </div>
+
+        <button onclick="closeAdmin()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl text-xs transition-colors">
+          Close Admin Panel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC & FILTERS -->
+  <script>
+    // HARDCODED ADMIN PASSWORD
+    const ADMIN_PASSWORD = "1029384756897969hidevbhai";
+
+    // STATE
+    let currentModalType = 'love'; // 'love', 'hate', 'bid'
+    let loveTotal = 140;
+    let hateTotal = 260;
+
+    let entries = [
+      { id: 1, side: 'love', author: 'User_42', amount: 10, text: 'The cinematography in the Battle of Winterfell was peak cinema regardless of the dark lighting.' },
+      { id: 2, side: 'hate', author: 'FreeFolkKing', amount: 25, text: 'Daenerys "forgot" about the Iron Fleet. Best military mind in Westeros somehow forgot boats exist.' },
+      { id: 3, side: 'hate', author: 'CoffeeCup99', amount: 15, text: 'They left a modern Starbucks coffee cup right in front of Daenerys in Episode 4.' }
+    ];
+
+    const PRESETS = {
+      love: [
+        "The soundtrack and musical score alone carried this entire season.",
+        "The visual effects and CGI dragon fights were unmatched on television.",
+        "The actors gave 100% effort despite the rushed pacing.",
+        "The battle sequences were peak cinematic television."
+      ],
+      hate: [
+        "The character arcs built over 7 years were ruined in 6 episodes.",
+        "The lighting in the long night episode was so dark you could not see anything.",
+        "Who has a better story than Bran the Broken? Almost everyone.",
+        "Major plot lines were completely abandoned without explanation."
+      ],
+      bid: [
+        "Star Wars: The Rise of Skywalker",
+        "Marvel Cinematic Universe Phase 4",
+        "The Witcher (Season 3)",
+        "The Lord of the Rings: Rings of Power"
+      ]
+    };
+
+    // SEVERE NSFW & SLUR FILTER (Allows standard swearing)
+    const FORBIDDEN_REGEX = /\b(nigger|nigga|faggot|kike|chink|cunt|pedophile|porn|nsfw|hentai|childporn)\b/i;
+
+    // INIT
+    window.onload = () => {
+      renderFeed();
+      updateTugOfWar();
+    };
+
+    // RENDER FUNCTIONS
+    function renderFeed() {
+      const loveList = document.getElementById('love-list');
+      const hateList = document.getElementById('hate-list');
+      
+      const loveEntries = entries.filter(e => e.side === 'love');
+      const hateEntries = entries.filter(e => e.side === 'hate');
+
+      document.getElementById('love-count').innerText = `${loveEntries.length} ${loveEntries.length === 1 ? 'entry' : 'entries'}`;
+      document.getElementById('hate-count').innerText = `${hateEntries.length} ${hateEntries.length === 1 ? 'entry' : 'entries'}`;
+
+      loveList.innerHTML = loveEntries.length ? loveEntries.map(e => createCardHTML(e, 'emerald')).join('') : '<p class="text-xs text-slate-500 italic p-2">No defense entries yet.</p>';
+      hateList.innerHTML = hateEntries.length ? hateEntries.map(e => createCardHTML(e, 'rose')).join('') : '<p class="text-xs text-slate-500 italic p-2">No slander entries yet.</p>';
+    }
+
+    function createCardHTML(entry, theme) {
+      return `
+        <div class="bg-slate-800 border border-slate-700/80 p-3.5 rounded-xl text-xs sm:text-sm shadow-sm transition-all hover:border-${theme}-500/40">
+          <p class="text-slate-200 leading-relaxed font-medium">"${escapeHTML(entry.text)}"</p>
+          <div class="flex justify-between items-center text-[10px] text-slate-400 mt-2.5 pt-2 border-t border-slate-700/50">
+            <span class="font-semibold text-slate-300">${escapeHTML(entry.author)}</span>
+            <span class="text-${theme}-400 font-mono font-bold">Backed with $${entry.amount}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateTugOfWar() {
+      const total = loveTotal + hateTotal;
+      const lovePct = total === 0 ? 50 : Math.round((loveTotal / total) * 100);
+      const hatePct = 100 - lovePct;
+
+      document.getElementById('love-bar').style.width = `${lovePct}%`;
+      document.getElementById('hate-bar').style.width = `${hatePct}%`;
+
+      document.getElementById('love-label').innerHTML = `<span>💚 LOVE (${lovePct}%)</span> — <span>$${loveTotal}</span>`;
+      document.getElementById('hate-label').innerHTML = `<span>$${hateTotal}</span> — <span>HATE (${hatePct}%) 🔥</span>`;
+    }
+
+    // MODAL LOGIC
+    function openModal(type) {
+      currentModalType = type;
+      const modal = document.getElementById('modal');
+      const title = document.getElementById('modal-title');
+      const amountInput = document.getElementById('bid-amount');
+      
+      amountInput.value = type === 'bid' ? 125 : 2;
+      handleAmountChange(amountInput.value);
+
+      if (type === 'bid') {
+        title.innerText = "Outbid & Nominate Show";
+      } else if (type === 'love') {
+        title.innerText = "Add to The Defense (Love)";
+      } else {
+        title.innerText = "Add to The Slander (Hate)";
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function handleAmountChange(val) {
+      const amount = parseFloat(val) || 0;
+      const badge = document.getElementById('tier-badge');
+      const label = document.getElementById('text-input-label');
+      const dropdown = document.getElementById('preset-dropdown');
+      const textarea = document.getElementById('custom-textarea');
+
+      if (amount >= 5) {
+        badge.innerText = "Custom Unlock (≥$5)";
+        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+        label.innerText = "Write Custom Submission";
+        dropdown.classList.add('hidden');
+        textarea.classList.remove('hidden');
+      } else {
+        badge.innerText = "Preset Only (<$5)";
+        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300";
+        label.innerText = "Select Preset Take";
+        textarea.classList.add('hidden');
+        dropdown.classList.remove('hidden');
+
+        // Populate presets
+        const list = PRESETS[currentModalType] || PRESETS.love;
+        dropdown.innerHTML = list.map(p => `<option value="${escapeHTML(p)}">${escapeHTML(p)}</option>`).join('');
+      }
+    }
+
+    function processSubmission() {
+      const handle = document.getElementById('user-handle').value.trim() || '@Anon';
+      const amount = parseFloat(document.getElementById('bid-amount').value) || 0;
+      let finalText = '';
+
+      if (amount >= 5) {
+        finalText = document.getElementById('custom-textarea').value.trim();
+        if (!finalText) {
+          alert("Please type a custom submission.");
+          return;
+        }
+
+        // PROFANITY / NSFW CHECK
+        if (FORBIDDEN_REGEX.test(finalText)) {
+          alert("Submission rejected: Contains prohibited slurs, explicit NSFW terms, or hate speech.");
+          return;
+        }
+      } else {
+        finalText = document.getElementById('preset-dropdown').value;
+      }
+
+      if (currentModalType === 'bid') {
+        document.getElementById('top-bidder-display').innerHTML = `$${amount} by ${escapeHTML(handle)} → <span class="text-white font-semibold">"${escapeHTML(finalText)}"</span>`;
+        alert(`Bid registered! In production, this redirects to Stripe to collect $${amount}.`);
+      } else {
+        entries.unshift({
+          id: Date.now(),
+          side: currentModalType,
+          author: handle,
+          amount: amount,
+          text: finalText
+        });
+
+        if (currentModalType === 'love') loveTotal += amount;
+        if (currentModalType === 'hate') hateTotal += amount;
+
+        renderFeed();
+        updateTugOfWar();
+        alert(`Entry added! In production, this redirects to your Stripe Payment Link.`);
+      }
+
+      closeModal();
+    }
+
+    // ADMIN PANEL ACCESS
+    function openAdmin() {
+      const input = prompt("Enter Secret Admin Password:");
+      if (input === ADMIN_PASSWORD) {
+        renderAdminEntries();
+        document.getElementById('admin-modal').classList.remove('hidden');
+      } else if (input !== null) {
+        alert("Access Denied: Incorrect Password!");
+      }
+    }
+
+    function closeAdmin() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function renderAdminEntries() {
+      const list = document.getElementById('admin-entries-list');
+      list.innerHTML = entries.map(e => `
+        <div class="flex justify-between items-center bg-slate-800 p-2.5 rounded-lg text-xs border border-slate-700">
+          <div class="truncate max-w-[280px]">
+            <span class="${e.side === 'love' ? 'text-emerald-400' : 'text-rose-400'} font-bold">[${e.side.toUpperCase()}]</span>
+            <span class="text-slate-300 font-medium">"${escapeHTML(e.text)}"</span>
+          </div>
+          <button onclick="deleteEntry(${e.id})" class="bg-rose-600/80 hover:bg-rose-500 text-white text-[10px] px-2 py-1 rounded font-bold transition-colors">
+            Delete
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function deleteEntry(id) {
+      entries = entries.filter(e => e.id !== id);
+      renderFeed();
+      renderAdminEntries();
